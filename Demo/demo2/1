@@ -1,0 +1,61 @@
+#include <iostream>
+using namespace std;
+
+//創造一個Complex的class 
+class Complex { 
+
+private:
+	double re; //宣告complex的實部 
+	double im; //宣告complex的虛部 
+	
+public:
+	//建立一個0+0i的建構子
+	Complex() : re(0.0), im(0.0) {} 
+	Complex(double r, double i): re(r),im(i) {} 
+	
+	Complex operator+(Complex &c) { // 兩複數相加 
+		Complex temp;
+		temp.re = re+c.re;
+		temp.im = im+c.im;
+		return temp;
+	}
+	
+	Complex operator*(Complex &c) { //兩複數相乘 
+		Complex temp; //設兩複數相乘為(a+bi)*(c+di),透過分配律展開得(ac-bd)+(ad+cb)i,注意:i^2為-1 
+		temp.re = (re*c.re) - (im*c.im); //兩複數相乘之實數部分 
+		temp.im = (re*c.im) + (im*c.re); //兩複數相乘之虛數部分 
+		return temp;
+	}
+	
+	friend ostream& operator<<(ostream &os, Complex &c) { //使用friend讓operator<<可以使用private的re和im 
+		os<<c.re<<"+"<<c.im<<"i";
+		return os;
+	}
+	
+	friend istream& operator>>(istream &is, Complex &c) { //使用friend讓operator>>可以使用private的re和im 
+		cout<<"請輸入實部:";
+		is>>c.re;
+		cout<<"請輸入虛部:";
+		is>>c.im;
+		return is;
+	}
+}; 
+
+int main() {
+	Complex c1(0,0),c2(3,2),c3,c4,sum,product;
+	
+	cout <<"定義複數1為:"<<c1<<endl;
+	cout <<"定義複數2為:"<<c2<<endl;
+	cout <<"請輸入複數3:"<<endl;
+	cin>>c3;
+	cout <<"請輸入複數4:"<<endl;
+	cin>>c4;
+	
+	sum=c1+c2+c3+c4;
+	product=c1*c2*c3*c4;
+	
+	cout <<"相加結果為:"<<sum<<endl;
+	cout <<"相乘結果為:"<<product<<endl;
+	
+	return 0; 
+}
