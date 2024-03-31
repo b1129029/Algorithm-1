@@ -1,0 +1,37 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Frequency {
+	private:
+		int ASCII = 128; //ASCII碼有128個 
+		int frequency[128] = {0};
+		
+	public:
+		void calculate(string input) { 
+			for(int i = 0; i<input.length(); i++) {
+				int c = input[i];  //input的第i個位置出現的字符，將其ASCII植存於c 
+				frequency[c]++; //將frequency陣列中c的位置的值加1 
+			}
+		}
+		
+		void display() {
+			for(int i = 0; i<ASCII; i++) {
+				if(frequency[i] != 0) { //frequency[i] != 0  --> 代表那個字元出現過 
+					cout<<"字元:"<<char(i) <<"出現了"<<frequency[i]<<"次"<<endl; //char()  --> 將ASCII碼轉成字符 
+				}
+			}
+		}
+};
+
+int main() {
+	string input_string;
+	cout<<"請輸入字串:";
+	getline(cin, input_string); //使用getline而不直接用cin的原因是為了防止空格後的字符被吃掉 
+	Frequency counter;
+	counter.calculate(input_string);
+	counter.display();
+	
+	system("pause");
+	return 0;
+}
