@@ -1,0 +1,46 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    int x,y;
+    cout<<"請輸入X(輸入X個字串):"<<endl;
+    cin>>x;
+    cout<<"請輸入Y(字串長度不可超過Y):"<<endl;
+    cin>>y;
+    
+    string** arr = new string*[x]; //創建一個動態的二維陣列 並將其存於arr[]中 
+    cin.ignore(); //清除進入緩衝區的函數 以便後面使用getline不會異常 
+    
+    for(int i=0;i<x;i++) {
+        cout<<"請輸入第"<<i+1<<"個字串:"<<endl;
+        string z;
+        getline(cin,z); //輸入後讀取輸入的東西並儲存於z 
+        arr[i] = new string(z); //讓arr[i]的位子有一個實體東西 
+        z.length();
+        if(z.length()>y) { //若字串長度超過Y 則終止程式 
+        	cout<<"Error!!!"<<endl;
+        	i--;
+        	break;
+		}
+		
+    }
+    
+    int n = x;
+	for(int i=n-1;i>0;i--) { //排序範圍從最後一個字元開始到第一個 
+        for(int j=0;j<i;j++) { // 從第一個字串開始比
+            if(*arr[j] <*arr[j+1]) { 
+            	string tmp = *arr[j];
+            	*arr[j] = *arr[j+1];
+            	*arr[j+1] = tmp;
+            }
+        }
+    }
+    
+    for(int i=0;i<x;i++) {
+    	cout<<*arr[i]<<endl;
+	}
+    
+    delete[] arr;
+    return 0;
+}
