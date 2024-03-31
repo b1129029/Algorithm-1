@@ -1,0 +1,124 @@
+#include <iostream>
+using namespace std;
+
+struct term {
+    int coef;
+    int exp;
+    term *next;
+};
+
+class polynomial {
+    private:
+    term *head;
+    
+    public:
+    int complexity;
+    polynomial() : head(nullptr),complexity(0) {} //建構函示(初始化),讓head為空指標
+    
+    void intput_term(int coef, int exp) { 
+        term *new_term = new term{coef, exp, nullptr};
+        if(head == nullptr) { 
+            head = new_term; //若head為空,則設new_term為head
+        }
+        else {
+            term *current = head;
+            while(current->next != nullptr && current->next->exp > exp) { //用來檢查下一項的指數是否大於exp,若大於就繼續往下找
+                current = current -> next;
+            }
+            new_term->next = current->next;
+            current->next = new_term;
+        }
+    }
+    
+    void same_exp() {
+        term*ptr1 , *ptr2 ,*now;
+        ptr1 = head;
+        while (ptr1!= nullptr && ptr1 ->next != nullptr) {
+            ptr2 = ptr1;
+            while (ptr2->next != nullptr) {
+                if(ptr1->exp == ptr2->next->exp) {
+                    ptr1->coef = ptr1->coef + ptr2->next->coef; 
+                    now = ptr2 -> next;
+                    ptr2->next = ptr2->next->next; 
+                    delete(now);
+                   // complexity++;
+                }
+                else {
+                    ptr2 = ptr2 ->next;
+                }
+            }
+            ptr1 = ptr1->next;
+        }
+    }
+
+    
+    
+    void sort() {
+        if(head == nullptr || head->next == nullptr) { 
+            return; //當頭標為null(沒有項)或是頭標下一項為空指標(只有一項)時不用排序
+        }
+        else {
+        	term *lastptr = nullptr; //因每一輪的泡沫排序法的最後一項一定是最大的,
+        	while (lastptr != head) {
+            	term *ptr = head;
+            	while(ptr->next != lastptr) {
+                	if(ptr->exp < ptr->next->exp) {
+                    	swap(ptr->coef, ptr->next->coef);
+                    	swap(ptr->exp, ptr->next->exp);
+                	}
+                	ptr = ptr->next;
+            	}
+            	lastptr = ptr;
+        	}
+    	}
+    }
+    
+    void print() {
+        sort();
+        term *current = head;
+        while(current != nullptr) {
+            cout << current->coef << "x^" << current->exp;
+            if(current->next != nullptr) {
+                cout << "+" ;
+            }
+            current = current->next;
+        }
+        cout << endl;
+    }
+    polynomial multiply(polynomial &r) {
+        polynomial answer;
+        term *current1 = head;
+        while(current1 != nullptr) {
+            term *current2 = r.head;
+            while(current2 != nullptr) {
+                
+                answer.intput_term(current1->coef * current2->coef, current1->exp + current2->exp);
+                current2 = current2->next;
+                answer.complexity++;
+            }
+            current1 = current1->next;
+        }
+        
+        return answer;
+    }
+};
+
+int main() {
+    polynomial poly_1,poly_2;
+    for (int m = 10; m <= 100; m += 10) {
+        polynomial poly_1; //初始化(歸零)
+        for(int i=0;i<m;i++) poly_1.intput_term(1, i);
+            for (int n = 10; n <= 100; n += 10){
+                polynomial poly_2; //初始化(歸零)
+                for(int i=0;i<n;i++) poly_2.intput_term(1, i);
+                polynomial product = poly_1.multiply(poly_2);
+                product.same_exp();
+                cout << m << ":" << n << ":" <<product.complexity <<endl;
+                product.complexity = 0;
+            }
+            
+    }
+    
+    system("pause");
+    return 0;
+}
