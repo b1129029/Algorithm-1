@@ -1,0 +1,154 @@
+#include <iostream>
+#include <cstdlib> //為了使用rand()和srand()
+#include <ctime> //為了使用time()
+using namespace std;
+int times=0;
+struct term {
+    int coef;
+    int exp;
+    term *next;
+};
+
+class polynomial {
+    private:
+    term *head;
+    
+    public:
+    int complexity;
+    polynomial() : head(nullptr),complexity(0) {} //建構函示(初始化),讓head為空指標
+    
+    void intput_term(int coef, int exp) { 
+        term *new_term = new term{coef, exp, nullptr};
+        if(head == nullptr) { 
+            head = new_term; //若head為空,則設new_term為head
+        }
+        else {
+            term *current = head;
+            while(current->next != nullptr && current->next->exp > exp) { //用來檢查下一項的指數是否大於exp,若大於就繼續往下找
+                current = current -> next;
+            }
+            if(current->next != nullptr && current->next->exp == exp) {
+                current->next->coef += coef;
+                times++;
+                return;
+            }
+            new_term->next = current->next;
+            current->next = new_term;
+        }
+    }
+    
+    void same_exp() {
+        term*ptr1 , *ptr2 ,*now;
+        ptr1 = head;
+        cout<<"ture";
+        while (ptr1!= nullptr && ptr1 ->next != nullptr) {
+            ptr2 = ptr1;
+            while (ptr2->next != nullptr) {
+                if(ptr1->exp == ptr2->next->exp) { //當前exp == 下一個exp
+                    ptr1->coef = ptr1->coef + ptr2->next->coef; //常數相加
+                    now = ptr2 -> next;
+                    ptr2->next = ptr2->next->next; //指向下一個
+                    delete(now);//刪除當前的
+                    times++;
+                }
+                else {
+                    ptr2 = ptr2 ->next;
+                }
+            }
+            ptr1 = ptr1->next;
+        }
+    }
+
+    
+    
+    void sort() {
+        if(head == nullptr || head->next == nullptr) { 
+            return; //當頭標為null(沒有項)或是頭標下一項為空指標(只有一項)時不用排序
+        }
+        bool swap_term = true; //初始化,先讓swap_term以true進入迴圈
+        term *lastptr = nullptr; //因每一輪的泡沫排序法的最後一項一定是最大的,
+        while (swap_term) {
+            swap_term = false; //在每一次排序前先把swap_term設成false,來表示這輪還沒排序過
+            term *ptr = head;
+            
+            while(ptr->next != lastptr) {
+                if(ptr->exp < ptr->next->exp) {
+                    swap(ptr->coef, ptr->next->coef);
+                    swap(ptr->exp, ptr->next->exp);
+                    
+                }
+                ptr = ptr->next;
+            }
+            lastptr = ptr;
+        }
+    }
+    
+    void print() {
+        
+        sort();
+        term *current = head;
+        while(current != nullptr) {
+            cout << current->coef << "x^" << current->exp;
+            if(current->next != nullptr) {
+                cout << "+" ;
+            }
+            current = current->next;
+        }
+        cout << endl;
+    }
+    polynomial multiply(polynomial &r) {
+        polynomial answer;
+        term *current1 = head;
+        while(current1 != nullptr) {
+            term *current2 = r.head;
+            while(current2 != nullptr) {
+                
+                answer.intput_term(current1->coef * current2->coef, current1->exp + current2->exp);
+                current2 = current2->next;
+                answer.complexity++;
+            }
+            current1 = current1->next;
+            
+        }
+        return answer;
+    }
+};
+
+int main() {
+    for(int w=10; w<=100; w+=10) {
+        polynomial poly1, poly3;
+            srand(time(nullptr));
+            int max = 1000;
+            int a1[max] , a2[max];
+            int i=0 , k=0;
+            for(int j=0; j<max; j++) a1[j] = 0;
+            while(i < w) {
+                int number = rand() %1000;
+                if(a1[number] == 0) {
+                    a1[number] = 1;
+                    i++;
+                }
+            }
+    for(int j=max-1; j>-1; j--) if(a1[j] != 0) poly1.intput_term(1, j);
+    for(int x=10; x<=100; x+=10){
+        polynomial poly2;
+        for(int j=0; j<max; j++) a2[j] = 0;
+            while(k < x){
+                int number = rand() %1000;
+                if(a2[number] == 0) {
+                    a2[number] = 1;
+                    k++;
+                }
+            }
+        for(int j=max-1; j>-1; j--) if(a2[j] != 0) poly2.intput_term(1, j);
+        poly3 = poly1.multiply(poly2); 
+        
+		cout<<poly3.complexity +times<<endl;
+        times = 0;
+        k = 0;
+        
+    }
+    poly3.complexity =0;
+	}
+return 0;
+}
