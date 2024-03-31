@@ -1,0 +1,170 @@
+#include <iostream>
+/*#include <cstdlib> //為了使用rand()和srand()
+#include <ctime> //為了使用time() */
+using namespace std;
+
+struct term {
+    int coef; //宣告係數 
+    int exp; //宣告指數 
+    term *next; //指向下一項的指標 
+};
+
+class polynomial { 
+    private:
+    term *head;
+    
+    public:
+    polynomial() : head(nullptr) {} //建構函示(初始化),讓head為空指標
+    
+    void intput_term(int coef, int exp) { //輸入的係數和指數 
+        term *new_term = new term{coef, exp, nullptr}; //創建一個新的項 
+        if(head == nullptr) { 
+            head = new_term; //若head為空,則設new_term為head
+        }
+        else {
+            term *current = head;  
+            while(current->next != nullptr && current->next->exp > exp) { //用來檢查下一項的指數是否大於exp,若大於就繼續往下找(降冪排列的概念)
+                current = current -> next;
+            }
+            new_term->next = current->next; 
+            current->next = new_term;
+        }
+    }
+    void same_exp() {
+        term *ptr1 , *ptr2 , *now;
+        ptr1 = head;
+        while (ptr1 != nullptr && ptr1->next != nullptr) { 
+            ptr2 = ptr1;
+            while (ptr2->next != nullptr) {
+                if(ptr1->exp == ptr2->next->exp) {
+                    ptr1->coef = ptr1->coef + ptr2->next->coef;
+                    now = ptr2 -> next;
+                    ptr2->next = ptr2->next->next; 
+                    delete(now);
+                }
+                else {
+                    ptr2 = ptr2 ->next;
+                }
+            }
+            ptr1 = ptr1->next;
+        }
+    }
+
+    
+    
+    void sort() {
+        if(head == nullptr || head->next == nullptr) { 
+            return; //當頭標為null(沒有項)或是頭標下一項為空指標(只有一項)時不用排序
+        }
+        else {
+        	term *lastptr = nullptr; //因每一輪的泡沫排序法的最後一項一定是最大的,故無需排序 
+        	while (lastptr != head) {
+           		term *ptr = head;
+            	while(ptr->next != lastptr) {
+                	if(ptr->exp < ptr->next->exp) {
+                    	swap(ptr->coef, ptr->next->coef);
+                    	swap(ptr->exp, ptr->next->exp);
+                	}
+                	ptr = ptr->next;
+            	}
+            	lastptr = ptr;
+        	}
+    	}
+    }
+    
+    void print() {
+        sort(); //先排序 
+        term *current = head;
+        while(current != nullptr) {
+            cout << current->coef << "x^" << current->exp;
+            if(current->next != nullptr) {
+                cout << "+" ;
+            }
+            current = current->next;
+        }
+        cout << endl;
+    }
+    
+    polynomial multiply(polynomial &r) {  
+        polynomial answer; //宣告一個用來儲存結果的polynomial叫做answer 
+        term *current1 = head;
+        while(current1 != nullptr) {
+            term *current2 = r.head;
+            while(current2 != nullptr) {
+                answer.intput_term(current1->coef * current2->coef, current1->exp + current2->exp);
+                current2 = current2->next;
+            }
+            current1 = current1->next;
+        }
+        return answer;
+    }
+};
+
+int main() {
+    
+    /*srand(static_cast<int>(time(nullptr)));
+    int m;
+    cout << "請輸入第一個多項式有幾項? ";
+    cin >> m;
+    polynomial poly_1;
+    for(int i=1; i<=m; i++) {
+        int random_number = rand() % 100;
+        int exp=random_number;
+        int coef=m-i;
+        poly_1.intput_term(coef, exp);
+    }
+    
+    int n;
+    cout << "請輸入第二個多項式有幾項? ";
+    cin >> n;
+    polynomial poly_2;
+    for(int i=1; i<=n; i++) {
+        int random_number = rand() % 100;
+        int exp=random_number;
+        int coef=m-i;
+        poly_2.intput_term(coef, exp);
+    } */
+    
+    int m;
+    cout << "請輸入第一個多項式有幾項? ";
+    cin >> m;
+    polynomial poly_1;
+    for(int i=1; i<=m; i++) {
+        int coef;
+        int exp;
+        cout << "輸入第"<< i << "個係數: ";
+        cin >> coef;
+        cout << "輸入第"<< i << "個指數: ";
+        cin >> exp;
+        poly_1.intput_term(coef, exp);
+    }
+    poly_1.same_exp();
+    
+    int n;
+    cout << "請輸入第二個多項式有幾項? ";
+    cin >> n;
+    polynomial poly_2;
+    for(int i=1; i<=n; i++) {
+        int coef;
+        int exp;
+        cout << "輸入第"<< i << "個係數: ";
+        cin >> coef;
+        cout << "輸入第"<< i << "個指數: ";
+        cin >> exp;
+        poly_2.intput_term(coef, exp);
+    }
+    poly_2.same_exp();
+    
+    cout << "第一個多項式: ";
+    poly_1.print();
+    cout << "第二個多項式: ";
+    poly_2.print();
+    
+    polynomial product = poly_1.multiply(poly_2);
+    product.same_exp();
+    cout << "相乘的結果: ";
+    product.print();
+    
+    system("pause");
+    return 0;
+}
